@@ -22,7 +22,7 @@ public class GameScreen implements Screen {
 	// public Bitmapgame.font game.font;
 	private Array<DropRect> droplets;
 	Iterator<DropRect> iter, deiter;
-
+ 
 	int dropSpawnTime, stormTime, flashTime;
 	float sekunda, gameTime, drop_amount;
 	long lastTimeDrop;
