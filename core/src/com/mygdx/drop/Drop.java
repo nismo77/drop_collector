@@ -57,19 +57,8 @@ public class Drop extends Game {
 
 	public void dispose() {
 		batch.dispose();
-		font.dispose();
-		
-		sndDrop.dispose();
-		sndWin.dispose();
-		sndFlake.dispose();
-		sndBell.dispose();
-		mscThunder.dispose();
-		imgBucket.dispose();
-		imgDrop.dispose();
-		imgSnowFlake.dispose();
-		imgWatch.dispose();
-		imgMeadow.dispose();
-		imgFlash.dispose();
+		font.dispose();		
+	
 		
 	}
 

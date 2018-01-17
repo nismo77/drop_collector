@@ -174,6 +174,17 @@ public class GameScreen implements Screen {
 	@Override
 	public void dispose() {
 
+		sndDrop.dispose();
+		sndWin.dispose();
+		sndFlake.dispose();
+		sndBell.dispose();
+		mscThunder.dispose();
+		imgBucket.dispose();
+		imgDrop.dispose();
+		imgSnowFlake.dispose();
+		imgWatch.dispose();
+		imgMeadow.dispose();
+		imgFlash.dispose();
 	}
 
 	public void logic() {
