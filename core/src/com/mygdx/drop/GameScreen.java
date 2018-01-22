@@ -81,10 +81,11 @@ public class GameScreen implements Screen {
 			public void clicked(InputEvent event, float x, float y) {
 				try {
 					player = new Player();
-					player.name = nameField.getMessageText();
-					if(player.name == null) {
-						player.name = "Unnamed Player";
+					player.name = nameField.getText();
+					if(player.name.isEmpty()) {
+						player.name = "Unnamed player";
 					}
+					else player.name = nameField.getText();
 					canPlay = true;					
 				} catch (Exception ex) {
 					System.out.println("Can't get player's name. Set default name :" + ex);
@@ -93,7 +94,7 @@ public class GameScreen implements Screen {
 		});
 
 		game.result = 0;
-		gameTime = 2.0f;
+		gameTime = 30.0f;
 		dropSpeedFactor = 0.3f;
 		dropSpawnTime = 400;
 
