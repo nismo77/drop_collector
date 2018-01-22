@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -25,7 +24,6 @@ public class EndScreen implements Screen {
 	private Texture splash;
     private int camWid, camHei;
     private Stage stage;
-    private Skin skin;
     private Table table;
     
     
@@ -39,14 +37,13 @@ public class EndScreen implements Screen {
 		camHei = splash.getHeight();
 		
 		stage = new Stage(new ScreenViewport());
-		skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
 		table = new Table();
 		
-		final TextButton yesButton = new TextButton("Yes",skin);
-		final TextButton noButton =  new TextButton("No" ,skin);
-		final TextButton againButton =  new TextButton("Again?" ,skin);
+		final TextButton yesButton = new TextButton("Yes",game.skin);
+		final TextButton noButton =  new TextButton("No" ,game.skin);
+		final TextButton againButton =  new TextButton("Again?" ,game.skin);
 
-	    final Dialog againDialog = new Dialog("Play again?",skin);
+	    final Dialog againDialog = new Dialog("Play again?",game.skin);
 	    
 	    againDialog.setWidth(stage.getWidth());
 	    table.setWidth(stage.getWidth());

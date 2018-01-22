@@ -8,8 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -24,30 +23,75 @@ public class MainMenuScreen implements Screen {
         private int camWid, camHei;
         private Stage stage;
         private Table table;
-        private Skin skin;
+		private  TextButton startBtn;
+		private TextButton quitBtn;
+		private TextButton creditsBtn;
+		private TextButton scoreBtn;
+		private Label titleLabel;
+
+
 
 	public MainMenuScreen(final Drop gam) {
 		game = gam;		
 
-		skin = new Skin(Gdx.files.internal("skin/uiskin.json"));
+		startBtn = new TextButton("Start",game.skin, "small");
+		quitBtn = new TextButton("Quit",game.skin, "small");
+		creditsBtn = new TextButton("Credits",game.skin, "small");
+		scoreBtn = new TextButton("Score board",game.skin, "small");
+		titleLabel = new Label("Drop collector",game.skin, "big");
 
+		
 		stage = new Stage(new ScreenViewport());
 		table = new Table();
 		table.setWidth(stage.getWidth());
-		table.align(Align.center|Align.top);
-		table.setPosition(0, Gdx.graphics.getHeight());
+		table.align(Align.center|Align.center);
+		table.setPosition(0, Gdx.graphics.getHeight()/2);
+
 		Gdx.input.setInputProcessor(stage);
+		
+		table.add(titleLabel).colspan(400).padTop(-100).align(Align.top);
+		table.row();
+		table.add(startBtn).width(150).padBottom(50);
+		table.row();
+		table.add(scoreBtn).width(150).padBottom(50);
+		table.row();
+		table.add(creditsBtn).width(150).padBottom(50);
+		table.row();
+		table.add(quitBtn).width(150).padBottom(50);
+		
+		stage.addActor(table);
+		
+		startBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				game.setScreen(new GameScreen(game));
+			}
+		});
+		
+		quitBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				Gdx.app.exit();
+			}
+		});
+		
+		scoreBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+//				game.setScreen(new GameScreen(game));
+			}
+		});
+		
+		creditsBtn.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+//				game.setScreen(new GameScreen(game));
+			}
+		});
 
 		
-		final TextButton startButton = new TextButton("Start", skin);
-		final TextButton quitButton =  new TextButton("Quit" , skin);
+
 		
-		table.padTop(50);
-		table.row();
-		table.add(startButton).padBottom(50);
-		table.row();
-		table.add(quitButton);
-		stage.addActor(table);		
 		
 		splash = new Texture(Gdx.files.internal("splash_mainmenu.jpg"));
 		camWid = splash.getWidth();
@@ -56,20 +100,7 @@ public class MainMenuScreen implements Screen {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, camWid, camHei);
 
-		startButton.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new EndScreen(game));
-				Gdx.app.log("Clicked", "CLICKED_TAG");
-			}
-		});
-		
-		quitButton.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				Gdx.app.exit();				
-			}
-		});
+	
 	}
 
 	@Override

@@ -8,8 +8,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class Drop extends Game {
 
@@ -17,11 +16,13 @@ public class Drop extends Game {
 	
 	Sound sndDrop, sndWin, sndFlake, sndBell;
 	Music mscThunder;
+	
 
 	SpriteBatch batch;
 	BitmapFont font;
 	public Music music;
-
+	public Skin skin;
+	
 	public int result = 0 , highScore;
 	byte[] hsbyte;
 
@@ -30,6 +31,12 @@ public class Drop extends Game {
 
 	public void create() {
 		
+		try {
+			skin = new Skin(Gdx.files.internal("skin/glassy/glassy-ui.json"));
+			System.out.println("Skin loaded successfully");
+		}catch(Exception ex) {
+			System.out.println("Can't read skin file "+ex);
+		}
 		hsbyte = new byte[1];
 
 		file = Gdx.files.local("highscore.hs");
@@ -57,8 +64,7 @@ public class Drop extends Game {
 
 	public void dispose() {
 		batch.dispose();
-		font.dispose();		
-	
+		font.dispose();			
 		
 	}
 
