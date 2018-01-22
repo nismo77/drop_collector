@@ -14,8 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Timer;
-import com.badlogic.gdx.utils.Timer.Task;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class EndScreen implements Screen {
@@ -46,20 +44,23 @@ public class EndScreen implements Screen {
 		
 		final TextButton yesButton = new TextButton("Yes",skin);
 		final TextButton noButton =  new TextButton("No" ,skin);
+		final TextButton againButton =  new TextButton("Again?" ,skin);
+
 	    final Dialog againDialog = new Dialog("Play again?",skin);
 	    
+	    againDialog.setWidth(stage.getWidth());
 	    table.setWidth(stage.getWidth());
-	    table.align(Align.center|Align.top);
+	    table.align(Align.top|Align.center);
 	    table.setPosition(0, Gdx.graphics.getHeight());
 	    table.setDebug(true);
 
-//	    yesButton.setWidth(200);
-//	    noButton.setWidth(200);
-	    table.padTop(50);
-	    table.add(againDialog).right();
+
+	    
+//	    table.padTop(50);
+	    table.add(againButton);
 	    table.row();
-	    table.add(yesButton).left();
-	    table.add(noButton).right();
+	    table.add(yesButton).center();
+	    table.add(noButton).center();
 	    
 	    stage.addActor(table);
 	    
