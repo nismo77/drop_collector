@@ -2,6 +2,7 @@ package com.mygdx.drop;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
@@ -22,7 +23,7 @@ public class Drop extends Game {
 	BitmapFont font;
 	public Music music;
 	public Skin skin;
-	
+	public Preferences prefs;
 	public int result = 0 , highScore;
 	byte[] hsbyte;
 
@@ -31,9 +32,12 @@ public class Drop extends Game {
 
 	public void create() {
 		
+		
 		try {
 			skin = new Skin(Gdx.files.internal("skin/glassy/glassy-ui.json"));
 			System.out.println("Skin loaded successfully");
+			prefs = Gdx.app.getPreferences("preferences.xml");
+			System.out.println("Preferences loaded successfully");
 		}catch(Exception ex) {
 			System.out.println("Can't read skin file "+ex);
 		}

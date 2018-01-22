@@ -43,13 +43,14 @@ public class MainMenuScreen implements Screen {
 		
 		stage = new Stage(new ScreenViewport());
 		table = new Table();
+//		table.setDebug(true);
 		table.setWidth(stage.getWidth());
 		table.align(Align.center|Align.center);
 		table.setPosition(0, Gdx.graphics.getHeight()/2);
 
 		Gdx.input.setInputProcessor(stage);
 		
-		table.add(titleLabel).colspan(400).padTop(-100).align(Align.top);
+		table.add(titleLabel).padBottom(100);
 		table.row();
 		table.add(startBtn).width(150).padBottom(50);
 		table.row();
@@ -85,7 +86,7 @@ public class MainMenuScreen implements Screen {
 		creditsBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-//				game.setScreen(new GameScreen(game));
+				game.setScreen(new CreditsScreen(game));
 			}
 		});
 

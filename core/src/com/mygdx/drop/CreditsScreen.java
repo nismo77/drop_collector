@@ -16,84 +16,89 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class GameScreen implements Screen {
+public class CreditsScreen implements Screen {
 
 	final Drop game;
 
 	// public Bitmapgame.font game.font;
 	private Array<DropRect> droplets;
 	Iterator<DropRect> iter, deiter;
-
+ 
 	int dropSpawnTime, stormTime, flashTime;
 	float sekunda, gameTime, drop_amount;
 	long lastTimeDrop;
 	boolean gameEnd = false;
 	boolean flash = false;
-	boolean canPlay = false;
 	boolean storm = false;
 	float dropSpeed, dropSpeedFactor, sflakeSpeed;
 
-	
 	int scrWid = Gdx.graphics.getWidth(), scrHei = Gdx.graphics.getHeight();
 	int camWid = Gdx.graphics.getWidth(), camHei = Gdx.graphics.getHeight();
 
 	private BucketRect bucket;
-
 	private OrthographicCamera camera;
-
+	
+	private Table table, dialogTable;
 	private Stage stage;
-	private Table table;
-	private TextField nameField;
-	private TextButton okBtn;
-	private Label labelName;
+	private Window creditWindow;
+	private TextButton backBtn;
+	private Label gfxLabel, sfxLabel, codeLabel, poweredLabel;
 
-	private Player player;
-
-	public GameScreen(final Drop game) {
+	public CreditsScreen(final Drop game) {
 		this.game = game;
 
+		creditWindow = new Window("Credits", game.skin);
+		backBtn = new TextButton("Back", game.skin, "small");
+		
+		gfxLabel = new Label("Gfx: opengameart.org",game.skin, "black");
+		sfxLabel = new Label("Sfx: opengameart.org",game.skin, "black");
+		codeLabel = new Label("Code: http://nism0.lunarii.org",game.skin, "black");
+		poweredLabel = new Label("Powered by: LibGdx",game.skin,"black");
+		
 		stage = new Stage(new ScreenViewport());
 		table = new Table();
-		labelName = new Label("Enter name: ", game.skin, "black");
-		okBtn = new TextButton("Enter", game.skin, "small");
-		nameField = new TextField("", game.skin);
+		dialogTable = new Table();
+		
 
 		table.setWidth(stage.getWidth());
-		table.setPosition(0, Gdx.graphics.getHeight() / 2);
-		table.align(Align.center | Align.center);
-
-		table.add(labelName);
-		table.add(nameField).width(150);
-		table.add(okBtn).width(100);
-		stage.addActor(table);
-
-		Gdx.input.setInputProcessor(stage);
-
-		okBtn.addListener(new ClickListener() {
+		table.setPosition(0, Gdx.graphics.getHeight());
+		table.align(Align.top|Align.center).padTop(20);
+	
+		dialogTable.align(Align.center|Align.center);
+		
+		dialogTable.add(gfxLabel).left();
+		dialogTable.row();
+		dialogTable.add(sfxLabel).left();
+		dialogTable.row();
+		dialogTable.add(codeLabel).left();
+		dialogTable.row();
+		dialogTable.add(poweredLabel).left();
+		dialogTable.row();
+		
+		creditWindow.add(dialogTable);
+		table.add(creditWindow).width(Gdx.graphics.getWidth()/2);
+		
+		stage.addActor(backBtn);
+		stage.addActor(table);	
+		
+		backBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				try {
-					player = new Player();
-					player.name = nameField.getMessageText();
-					if(player.name == null) {
-						player.name = "Unnamed Player";
-					}
-					canPlay = true;					
-				} catch (Exception ex) {
-					System.out.println("Can't get player's name. Set default name :" + ex);
-				}
+				game.music.stop();
+				game.setScreen(new MainMenuScreen(game));
 			}
 		});
+		
+		Gdx.input.setInputProcessor(stage);
+		
 
-		game.result = 0;
-		gameTime = 2.0f;
 		dropSpeedFactor = 0.3f;
 		dropSpawnTime = 400;
 
@@ -107,16 +112,10 @@ public class GameScreen implements Screen {
 		// viewport = new FitViewport(800,600,camera);
 
 		game.imgDrop = new Texture("droplet.png");
-		game.imgBucket = new Texture("bucket.png");
 		game.imgSnowFlake = new Texture("snowflake.png");
 		game.imgWatch = new Texture("watch.png");
 		game.imgMeadow = new Texture("meadow.jpg"); // 1200x800
-		game.imgFlash = new Texture("thunderflash.png");
 
-		game.sndDrop = Gdx.audio.newSound(Gdx.files.internal("waterdrop.wav"));
-		game.sndFlake = Gdx.audio.newSound(Gdx.files.internal("flakehit.wav"));
-		game.sndBell = Gdx.audio.newSound(Gdx.files.internal("bell.wav"));
-		game.mscThunder = Gdx.audio.newMusic(Gdx.files.internal("thunder.wav"));
 
 		game.music.setLooping(true);
 		game.music.play();
@@ -146,6 +145,8 @@ public class GameScreen implements Screen {
 		// coordinate system specified by the camera.
 		game.batch.setProjectionMatrix(camera.combined);
 		camera.setToOrtho(false, camWid, camHei);
+		stage.act(Gdx.graphics.getDeltaTime());
+
 
 		if (scrWid > 1200) {
 			camWid = 1200;
@@ -168,31 +169,22 @@ public class GameScreen implements Screen {
 			}
 
 		}
-		game.batch.end();
-		if (canPlay) {
-			game.batch.begin();
-			game.font.getData().setScale(camWid / 5000.0f, camHei / 5000.0f);
-			game.imgBucket.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		game.font.getData().setScale(camWid / 5000.0f, camHei / 5000.0f);
 
-			game.font.draw(game.batch, "Drops Collected: " + game.result, 0, camHei - game.font.getScaleY());
-			game.font.draw(game.batch, "["+player.name+" ]", 0, camHei - game.font.getScaleY() - 30);
-			game.font.draw(game.batch, "Time: " + (int) gameTime, camWid - camWid * 0.3f,
-					camHei - game.font.getScaleY());
-			game.batch.draw(game.imgBucket, bucket.x, bucket.y);
-			for (DropRect raindrop : droplets) {
-				raindrop.img.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-				game.batch.draw(raindrop.img, raindrop.x, raindrop.y);
-			}
-			game.batch.end();
-
-			// check if we need to create a new raindrop
-			if (TimeUtils.millis() - lastTimeDrop > 5000)
-				spawnDrop();
-
-			logic();
-		} else {
-			stage.draw();
+		for (DropRect raindrop : droplets) {
+			raindrop.img.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+			game.batch.draw(raindrop.img, raindrop.x, raindrop.y);
 		}
+		game.batch.end();
+
+		// check if we need to create a new raindrop
+		if (TimeUtils.millis() - lastTimeDrop > 5000)
+			spawnDrop();
+
+		stage.draw();
+		logic();
+		
+		
 
 	}
 
@@ -271,70 +263,7 @@ public class GameScreen implements Screen {
 			if (dr.y < 0) {
 				iter.remove();
 			}
-			if (dr.overlaps(bucket)) {
-				if (dr.img == game.imgDrop) {
-					game.sndDrop.play();
-					game.result++;
-				} else if (dr.img == game.imgSnowFlake) {
-					game.sndFlake.play();
-					game.result += 2;
-				} else if (dr.img == game.imgWatch) {
-					game.sndBell.play();
-					gameTime = gameTime + 3 * sekunda;
-				}
-				// storm happens here
-				if (game.result >= 50) {
-					storm = true;
-					flash = true;
-					if (flashTime >= 2)
-						flash = false;
-					if (stormTime >= 15) {
-						storm = false;
-					}
-					if (storm) {
-						game.mscThunder.play();
-						dropSpeedFactor = 0.5f;
-						dropSpawnTime = 200;
-					} else {
-						dropSpeedFactor = 0.3f;
-						dropSpawnTime = 400;
-					}
-				}
-				iter.remove();
-			}
-		}
-		if (sekunda > 1) {
-			gameTime -= sekunda;
-			if (storm) {
-				stormTime++;
-				flashTime++;
-				System.out.printf("stormTime: %d\n", stormTime);
-				System.out.printf("flashTime: %d\n", flashTime);
-			}
-			sekunda = 0;
-		}
-
-		// check game end
-		if (gameTime <= 0) {
-			gameEnd = true;
-		}
-
-		if (gameTime <= 0) {
-			player.score = game.result;
-			game.prefs.putString("name", player.name);
-			game.prefs.putInteger("score", player.score);
-			System.out.printf("PLayer score prefs: %d\n", game.prefs.getInteger("score"));
-
-			if (game.result > game.highScore) {
-				game.highScore = game.result;
-				game.hsbyte[0] = (byte) game.highScore;
-				game.file.writeBytes(game.hsbyte, false);
-			}
-
-			System.out.printf("Prefs name: %s\n", game.prefs.getString("name"));
-//			game.setScreen(new EndScreen(this.game));
-		}
-		sekunda += Gdx.graphics.getDeltaTime();
+		}	
 	}
 
 	public void spawnDrop() {
