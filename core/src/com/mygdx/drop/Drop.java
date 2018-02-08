@@ -1,5 +1,7 @@
 package com.mygdx.drop;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -17,6 +19,9 @@ public class Drop extends Game {
 	
 	Sound sndDrop, sndWin, sndFlake, sndBell;
 	Music mscThunder;
+	
+	public String[] names;
+	public String[] scores;
 	
 
 	SpriteBatch batch;
@@ -36,25 +41,10 @@ public class Drop extends Game {
 		try {
 			skin = new Skin(Gdx.files.internal("skin/glassy/glassy-ui.json"));
 			System.out.println("Skin loaded successfully");
-			prefs = Gdx.app.getPreferences("preferences.xml");
-			System.out.println("Preferences loaded successfully");
 		}catch(Exception ex) {
 			System.out.println("Can't read skin file "+ex);
 		}
-		hsbyte = new byte[1];
 
-		file = Gdx.files.local("highscore.hs");
-		if (!(isHSAv = file.exists())) {
-			System.out.println("Cannot open highscore.hs file! Creating a file...");
-			file = Gdx.files.local("highscore.hs");
-			file.writeBytes(new byte[] { 23 }, false);
-		} else {
-			// if file exists, read the highscore
-			System.out.println("Got the highscore file: " + file.path());
-			hsbyte = file.readBytes();
-			System.out.println("HS is: "+hsbyte[0]);
-			highScore = hsbyte[0];
-		}
 		batch = new SpriteBatch();
 		font = new BitmapFont(Gdx.files.internal("font.fnt"));
 		music = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));

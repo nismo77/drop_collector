@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -43,18 +43,18 @@ public class EndScreen implements Screen {
 		final TextButton noButton =  new TextButton("No" ,game.skin);
 		final TextButton againButton =  new TextButton("Again?" ,game.skin);
 
-	    final Dialog againDialog = new Dialog("Play again?",game.skin);
+	    final Label againLabel = new Label("Play again?",game.skin, "big");
 	    
-	    againDialog.setWidth(stage.getWidth());
+	   
 	    table.setWidth(stage.getWidth());
 	    table.align(Align.top|Align.center);
-	    table.setPosition(0, Gdx.graphics.getHeight());
-	    table.setDebug(true);
+	    table.setPosition(0, (Gdx.graphics.getHeight()/2)+yesButton.getHeight());
+//	    table.setDebug(true);
 
 
 	    
-//	    table.padTop(50);
-	    table.add(againButton);
+//	    table.padTop();
+	    table.add(againLabel).colspan(2).padBottom(camHei*0.05f);
 	    table.row();
 	    table.add(yesButton).center();
 	    table.add(noButton).center();
@@ -97,6 +97,9 @@ public class EndScreen implements Screen {
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 		
+		game.batch.begin();
+		game.batch.draw(splash, 0,0);
+		game.batch.end();
 		stage.act(Gdx.graphics.getDeltaTime());
 		stage.draw();
 		

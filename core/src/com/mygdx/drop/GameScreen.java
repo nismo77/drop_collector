@@ -1,9 +1,8 @@
 package com.mygdx.drop;
-
 import java.util.Iterator;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,14 +19,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class GameScreen implements Screen {
 
 	final Drop game;
-
-	// public Bitmapgame.font game.font;
+	public FileHandle hsFile;
 	private Array<DropRect> droplets;
 	Iterator<DropRect> iter, deiter;
 
@@ -39,30 +38,34 @@ public class GameScreen implements Screen {
 	boolean canPlay = false;
 	boolean storm = false;
 	float dropSpeed, dropSpeedFactor, sflakeSpeed;
-
 	
 	int scrWid = Gdx.graphics.getWidth(), scrHei = Gdx.graphics.getHeight();
 	int camWid = Gdx.graphics.getWidth(), camHei = Gdx.graphics.getHeight();
-
+	
 	private BucketRect bucket;
-
 	private OrthographicCamera camera;
-
 	private Stage stage;
 	private Table table;
 	private TextField nameField;
 	private TextButton okBtn;
 	private Label labelName;
-
+	private float btnWid = Gdx.graphics.getWidth() * 0.35f;
+	
 	private Player player;
 
 	public GameScreen(final Drop game) {
-		this.game = game;
-
+		this.game = game;		
+		try {
+			hsFile = Gdx.files.local("hs.hs");
+			System.out.println("Got hs file");
+		}
+		catch(Exception ex) {
+			System.out.print("Can't open scoreboard file: ");
+		}
 		stage = new Stage(new ScreenViewport());
 		table = new Table();
 		labelName = new Label("Enter name: ", game.skin, "black");
-		okBtn = new TextButton("Enter", game.skin, "small");
+		okBtn = new TextButton("Enter", game.skin);
 		nameField = new TextField("", game.skin);
 
 		table.setWidth(stage.getWidth());
@@ -71,42 +74,40 @@ public class GameScreen implements Screen {
 
 		table.add(labelName);
 		table.add(nameField).width(150);
-		table.add(okBtn).width(100);
+		table.add(okBtn).width(btnWid);
 		stage.addActor(table);
-
+		
 		Gdx.input.setInputProcessor(stage);
-
+		
 		okBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				try {
 					player = new Player();
-					player.name = nameField.getText();
-					if(player.name.isEmpty()) {
-						player.name = "Unnamed player";
+					player.setName(nameField.getText());
+					if(player.getName().isEmpty()) {
+						player.setName("Unnamed player");
 					}
-					else player.name = nameField.getText();
+					else {
+						if(player.getName().length() > 25) {
+							player.setName(player.getName().substring(0, 19));
+						}else player.setName(nameField.getText());
+					}
+				
 					canPlay = true;					
 				} catch (Exception ex) {
 					System.out.println("Can't get player's name. Set default name :" + ex);
 				}
 			}
 		});
-
 		game.result = 0;
-		gameTime = 30.0f;
+		gameTime = 2.0f;
 		dropSpeedFactor = 0.3f;
 		dropSpawnTime = 400;
-
 		droplets = new Array<DropRect>();
-
-		// game.font = new Bitmapgame.font();
 		game.font.setColor(Color.MAGENTA);
-
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		// viewport = new FitViewport(800,600,camera);
-
 		game.imgDrop = new Texture("droplet.png");
 		game.imgBucket = new Texture("bucket.png");
 		game.imgSnowFlake = new Texture("snowflake.png");
@@ -124,25 +125,20 @@ public class GameScreen implements Screen {
 
 		bucket = new BucketRect(camWid, camHei);
 		spawnDrop();
-	}
-
+		}
 	@Override
 	public void show() {
 		game.music.play();
 	}
-
 	@Override
 	public void render(float delta) {
-
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		scrWid = Gdx.graphics.getWidth();
 		scrHei = Gdx.graphics.getHeight();
 
-		// tell the camera to update its matrices.
 		camera.update();
-
 		// tell the SpriteBatch to render in the
 		// coordinate system specified by the camera.
 		game.batch.setProjectionMatrix(camera.combined);
@@ -167,7 +163,6 @@ public class GameScreen implements Screen {
 				game.batch.draw(game.imgMeadow, 0, 0);
 				game.batch.draw(game.imgFlash, 0, 0);
 			}
-
 		}
 		game.batch.end();
 		if (canPlay) {
@@ -176,7 +171,7 @@ public class GameScreen implements Screen {
 			game.imgBucket.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
 			game.font.draw(game.batch, "Drops Collected: " + game.result, 0, camHei - game.font.getScaleY());
-			game.font.draw(game.batch, "["+player.name+" ]", 0, camHei - game.font.getScaleY() - 30);
+			game.font.draw(game.batch, "["+player.getName()+" ]", 0, camHei - game.font.getScaleY() - 30);
 			game.font.draw(game.batch, "Time: " + (int) gameTime, camWid - camWid * 0.3f,
 					camHei - game.font.getScaleY());
 			game.batch.draw(game.imgBucket, bucket.x, bucket.y);
@@ -189,14 +184,11 @@ public class GameScreen implements Screen {
 			// check if we need to create a new raindrop
 			if (TimeUtils.millis() - lastTimeDrop > 5000)
 				spawnDrop();
-
 			logic();
 		} else {
 			stage.draw();
 		}
-
 	}
-
 	@Override
 	public void resize(int width, int height) {
 
@@ -212,25 +204,18 @@ public class GameScreen implements Screen {
 
 		camera.setToOrtho(false, camWid, camHei);
 	}
-
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
-
 	}
-
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
-
 	}
-
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-
 	}
-
 	@Override
 	public void dispose() {
 		game.sndDrop.dispose();
@@ -247,7 +232,6 @@ public class GameScreen implements Screen {
 	}
 
 	public void logic() {
-
 		dropSpeed = dropSpeedFactor * 500;
 
 		Vector3 touchPos = new Vector3();
@@ -314,26 +298,22 @@ public class GameScreen implements Screen {
 			}
 			sekunda = 0;
 		}
-
 		// check game end
 		if (gameTime <= 0) {
 			gameEnd = true;
 		}
-
 		if (gameTime <= 0) {
-			player.score = game.result;
-			game.prefs.putString("name", player.name);
-			game.prefs.putInteger("score", player.score);
-			System.out.printf("PLayer score prefs: %d\n", game.prefs.getInteger("score"));
-
+			
+			player.setScore(12);
+			String finalScore = player.getName()+":"+player.getScore()+"\n";
+			hsFile.writeString(finalScore, true);
+		
 			if (game.result > game.highScore) {
 				game.highScore = game.result;
 				game.hsbyte[0] = (byte) game.highScore;
 				game.file.writeBytes(game.hsbyte, false);
 			}
-
-			System.out.printf("Prefs name: %s\n", game.prefs.getString("name"));
-//			game.setScreen(new EndScreen(this.game));
+			game.setScreen(new EndScreen(this.game));
 		}
 		sekunda += Gdx.graphics.getDeltaTime();
 	}
@@ -352,20 +332,14 @@ public class GameScreen implements Screen {
 			DropRect drop = new DropRect(camWid, camHei, game.imgDrop);
 			droplets.add(drop);
 		}
-
 		lastTimeDrop = TimeUtils.millis();
-
 	}
 
 	public void clearDrops(Array<DropRect> drops) {
-
 		deiter = drops.iterator();
 		while (deiter.hasNext()) {
 			DropRect rd = deiter.next();
 			deiter.remove();
-
 		}
-
 	}
-
 }

@@ -7,9 +7,7 @@ buildscript {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         jcenter()
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
-        
+    dependencies {        
 
     }
 }
@@ -46,25 +44,12 @@ project(":desktop") {
         compile project(":core")   
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 
         
     }
 }
 
-project(":android") {
-    apply plugin: "android"
-
-    configurations { natives }
-
-    dependencies {
-        compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
-    
-        
-    }
-}
 
 project(":core") {
     apply plugin: "java"
@@ -74,7 +59,6 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
        
    		compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

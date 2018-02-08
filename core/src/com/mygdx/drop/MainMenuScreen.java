@@ -28,39 +28,41 @@ public class MainMenuScreen implements Screen {
 		private TextButton creditsBtn;
 		private TextButton scoreBtn;
 		private Label titleLabel;
+		private float btnWid = Gdx.graphics.getWidth()*0.35f;
 
 
 
 	public MainMenuScreen(final Drop gam) {
 		game = gam;		
 
-		startBtn = new TextButton("Start",game.skin, "small");
-		quitBtn = new TextButton("Quit",game.skin, "small");
-		creditsBtn = new TextButton("Credits",game.skin, "small");
-		scoreBtn = new TextButton("Score board",game.skin, "small");
+		startBtn = new TextButton("Start",game.skin);
+		quitBtn = new TextButton("Quit",game.skin);
+		creditsBtn = new TextButton("Credits",game.skin);
+		scoreBtn = new TextButton("Score board",game.skin);
 		titleLabel = new Label("Drop collector",game.skin, "big");
 
 		
 		stage = new Stage(new ScreenViewport());
 		table = new Table();
-//		table.setDebug(true);
+		table.setDebug(true);
 		table.setWidth(stage.getWidth());
 		table.align(Align.center|Align.center);
 		table.setPosition(0, Gdx.graphics.getHeight()/2);
 
-		Gdx.input.setInputProcessor(stage);
-		
 		table.add(titleLabel).padBottom(100);
 		table.row();
-		table.add(startBtn).width(150).padBottom(50);
+		table.add(startBtn).width(btnWid).padBottom(50);
 		table.row();
-		table.add(scoreBtn).width(150).padBottom(50);
+		table.add(scoreBtn).width(btnWid).padBottom(50);
 		table.row();
-		table.add(creditsBtn).width(150).padBottom(50);
+		table.add(creditsBtn).width(btnWid).padBottom(50);
 		table.row();
-		table.add(quitBtn).width(150).padBottom(50);
+		table.add(quitBtn).width(btnWid).padBottom(50);
 		
 		stage.addActor(table);
+		table.setDebug(true);
+
+		Gdx.input.setInputProcessor(stage);
 		
 		startBtn.addListener(new ClickListener() {
 			@Override
@@ -79,7 +81,7 @@ public class MainMenuScreen implements Screen {
 		scoreBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-//				game.setScreen(new GameScreen(game));
+				game.setScreen(new LeaderboardScreen(game));
 			}
 		});
 		
@@ -88,20 +90,13 @@ public class MainMenuScreen implements Screen {
 			public void clicked(InputEvent event, float x, float y) {
 				game.setScreen(new CreditsScreen(game));
 			}
-		});
-
-		
-
-		
+		});	
 		
 		splash = new Texture(Gdx.files.internal("splash_mainmenu.jpg"));
 		camWid = splash.getWidth();
-		camHei = splash.getHeight();
-		
+		camHei = splash.getHeight();		
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, camWid, camHei);
-
-	
+		camera.setToOrtho(false, camWid, camHei);	
 	}
 
 	@Override
@@ -109,17 +104,14 @@ public class MainMenuScreen implements Screen {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		stage.act(Gdx.graphics.getDeltaTime());	
 		
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 
-		game.batch.begin();
-		game.font.getData().setScale(.4f, .4f);
-		game.font.setColor(Color.GOLD);
-		
+		game.batch.begin();		
 		game.batch.draw(splash, 0,0);
 		game.batch.end();
+		stage.act(Gdx.graphics.getDeltaTime());	
 		stage.draw();
 	
 	}

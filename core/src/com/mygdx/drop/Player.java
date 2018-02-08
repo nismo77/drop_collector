@@ -2,17 +2,33 @@ package com.mygdx.drop;
 
 public class Player {
 
-	public String name;
-	public int score;
+	private String name;
+	private int score;
 	
-	public Player(String name) {
-		this.name = name;
-		this.score = 0;
+	public Player(String name, int score) {
+		this.setName(name);
+		this.setScore(0);
 	}
 	
 	public Player() {
-		this.name = "Unnamed Player";
-		this.score = 0;
+		this.setName("Unnamed Player");
+		this.setScore(0);
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 }
