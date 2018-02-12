@@ -101,7 +101,7 @@ public class GameScreen implements Screen {
 			}
 		});
 		game.result = 0;
-		gameTime = 2.0f;
+		gameTime = 40.0f;
 		dropSpeedFactor = 0.3f;
 		dropSpawnTime = 400;
 		droplets = new Array<DropRect>();
@@ -304,15 +304,10 @@ public class GameScreen implements Screen {
 		}
 		if (gameTime <= 0) {
 			
-			player.setScore(12);
+			player.setScore(game.result);
 			String finalScore = player.getName()+":"+player.getScore()+"\n";
-			hsFile.writeString(finalScore, true);
+			hsFile.writeString(finalScore, true);		
 		
-			if (game.result > game.highScore) {
-				game.highScore = game.result;
-				game.hsbyte[0] = (byte) game.highScore;
-				game.file.writeBytes(game.hsbyte, false);
-			}
 			game.setScreen(new EndScreen(this.game));
 		}
 		sekunda += Gdx.graphics.getDeltaTime();
@@ -338,7 +333,7 @@ public class GameScreen implements Screen {
 	public void clearDrops(Array<DropRect> drops) {
 		deiter = drops.iterator();
 		while (deiter.hasNext()) {
-			DropRect rd = deiter.next();
+			//DropRect rd = deiter.next();
 			deiter.remove();
 		}
 	}

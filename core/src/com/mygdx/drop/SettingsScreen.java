@@ -2,12 +2,13 @@ package com.mygdx.drop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -15,33 +16,42 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class MainMenuScreen implements Screen {
+public class SettingsScreen implements Screen {
 	
         final Drop game;
         OrthographicCamera camera;
+        private FileHandle hsFile;
         private Texture splash;
         private int camWid, camHei;
         private Stage stage;
         private Table table;
-		private  TextButton startBtn;
-		private TextButton quitBtn;
-		private TextButton creditsBtn;
-		private TextButton scoreBtn;
-		private TextButton settingsBtn;
+		private TextButton backBtn;
+		private TextButton clearLeadBtn;
+
 		private Label titleLabel;
+		private Label clearLabel;
+		private Dialog clearedDlg;
 		private float btnWid = Gdx.graphics.getWidth()*0.35f;
+		
+		private boolean fileMissing = false;
 
 
 
-	public MainMenuScreen(final Drop gam) {
+	public SettingsScreen(final Drop gam) {
 		game = gam;		
 
-		startBtn = new TextButton("Start",game.skin);
-		quitBtn = new TextButton("Quit",game.skin);
-		creditsBtn = new TextButton("Credits",game.skin);
-		scoreBtn = new TextButton("Score board",game.skin);
-		settingsBtn = new TextButton("Settings", game.skin);
-		titleLabel = new Label("Drop collector",game.skin, "big");
+		try {
+			hsFile = Gdx.files.local("hs.hs");
+			System.out.printf("[INFO] Got the hs file");
+		}catch(Exception e) {
+			System.out.println("[ERROR] Can't get hs file (missing?)");
+			fileMissing = true;
+		}
+		clearedDlg = new Dialog("Scoreboard cleared...",game.skin);
+		clearLeadBtn = new TextButton("Clear",game.skin);
+		backBtn = new TextButton("Back",game.skin);
+		titleLabel = new Label("Settings",game.skin, "big");
+		clearLabel = new Label("Clear scoreboard", game.skin, "big-black");
 
 		
 		stage = new Stage(new ScreenViewport());
@@ -53,55 +63,33 @@ public class MainMenuScreen implements Screen {
 
 		table.add(titleLabel).padBottom(100);
 		table.row();
-		table.add(startBtn).width(btnWid).padBottom(50);
-		table.row();
-		table.add(settingsBtn).width(btnWid).padBottom(50);
-		table.row();
-		table.add(scoreBtn).width(btnWid).padBottom(50);
-		table.row();
-		table.add(creditsBtn).width(btnWid).padBottom(50);
-		table.row();
-		table.add(quitBtn).width(btnWid).padBottom(50);
+		table.add(clearLabel).width(btnWid).padBottom(50);
+		table.add(clearLeadBtn).width(btnWid).padBottom(50);
+	
 		
 		stage.addActor(table);
+		stage.addActor(backBtn);
 
 		Gdx.input.setInputProcessor(stage);
 		
-		
-		settingsBtn.addListener(new ClickListener() {
+		backBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new SettingsScreen(game));
+				game.setScreen(new MainMenuScreen(game));
 			}
 		});
 		
-		startBtn.addListener(new ClickListener() {
+		clearLeadBtn.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new GameScreen(game));
+				if(!fileMissing) {
+					hsFile.delete();
+					clearedDlg.show(stage);
+				}
 			}
 		});
 		
-		quitBtn.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				Gdx.app.exit();
-			}
-		});
-		
-		scoreBtn.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new LeaderboardScreen(game));
-			}
-		});
-		
-		creditsBtn.addListener(new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new CreditsScreen(game));
-			}
-		});	
+	
 		
 		splash = new Texture(Gdx.files.internal("splash_mainmenu.jpg"));
 		camWid = splash.getWidth();

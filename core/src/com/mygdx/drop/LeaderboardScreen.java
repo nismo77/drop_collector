@@ -1,6 +1,7 @@
 package com.mygdx.drop;
 
-import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class LeaderboardScreen implements Screen {
@@ -26,9 +28,8 @@ public class LeaderboardScreen implements Screen {
 	private Stage stage;
 	private Table table;
 	private Label titleLabel;
-	private FileHandle scoreFile;		
+	private FileHandle scoreFile;
 	private TextButton back;
-
 
 	public LeaderboardScreen(final Drop gam) {
 		game = gam;
@@ -40,50 +41,74 @@ public class LeaderboardScreen implements Screen {
 		splash = new Texture(Gdx.files.internal("meadow.jpg"));
 		stage = new Stage(new ScreenViewport());
 		table = new Table();
-		
-		back = new TextButton("Back",game.skin, "small");
+
+		back = new TextButton("Back", game.skin, "small");
 		titleLabel = new Label("Scoreboard", game.skin, "big-black");
 		table.setWidth(stage.getWidth());
-		table.align(Align.center|Align.center);
+		table.align(Align.center | Align.center);
 
-		table.setPosition(0, camHei/2);
-		table.setDebug(true);
-		
-		Gdx.input.setInputProcessor(stage);	
+		table.setPosition(0, camHei / 2);
+//		table.setDebug(true);
+
+		Gdx.input.setInputProcessor(stage);
+
 
 		table.add(titleLabel).padBottom(50).colspan(2); // TODO: Change this to flexbile value
 		table.row();
-		table.add(new Label("Name",game.skin,"black")).width(150).padBottom(20).width(50);
-		table.add(new Label("Score",game.skin,"black")).width(150).padBottom(20).width(50);
-		table.row(); // <-- TODO: Change this to flexible value
 		
 		scoreFile = Gdx.files.local("hs.hs");
-		if(scoreFile.exists()) {
+		String tmp="";
+		if (scoreFile.exists()) {
 			System.out.println("Hs file loaded successfully in scoreboardScreen");
+			tmp = scoreFile.readString();
+		} else {
+			System.out.println("Could not load the " + scoreFile.name());
 		}
-		else {
-			System.out.println("Could not load the "+scoreFile.name());
-		}
-		
-		String tmp = scoreFile.readString();
-		String[] lines = tmp.split("\\r?\\n");	
-	
-		ArrayList<String[]> scores = new ArrayList<String[]>();
-		for(String line : lines) {
-			scores.add(line.split(":"));
-		}
-		for(String[] s : scores) {
-			for(String l : s) {
-				table.add(new Label(l,game.skin,"black")).padBottom(10).maxWidth(camWid*0.3f);
+
+		if (tmp.isEmpty()) {
+			table.add(new Label("No scores yet...", game.skin, "big-black")).colspan(2);
+		} else {
+			String[] lines = tmp.split("\\r?\\n");
+			Array<String[]> scores = new Array<String[]>();
+			Array<Player> players = new Array<Player>();
+
+			for (String l : lines) {
+				scores.add(l.split(":"));
 			}
-			table.row();
-		}		
-		
-	
+
+			Iterator<String[]> iter = scores.iterator();
+
+			while (iter.hasNext()) {
+				String[] s = iter.next();
+				players.add(new Player(s[0], Integer.parseInt(s[1])));
+			}
+
+			players.sort(new Comparator<Player>() {
+
+				@Override
+				public int compare(Player p1, Player p2) {
+					return p2.compareTo(p1);
+				}
+
+			});
+
+			int ps = players.size;
+			int k = 0;
+			if (ps > 10)
+				ps = 10;
+
+			for (Player p : players) {
+				if (k == ps)
+					break;
+				table.add(new Label(p.getName(), game.skin, "big-black"));
+				table.add(new Label(Integer.toString(p.getScore()), game.skin, "big-black"));
+				table.row();
+				k++;
+			}
+		}
 		stage.addActor(table);
 		stage.addActor(back);
 
-		
 		back.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
@@ -91,10 +116,11 @@ public class LeaderboardScreen implements Screen {
 			}
 		});
 	}
+
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+
 		camera.update();
 		game.batch.setProjectionMatrix(camera.combined);
 		camera.setToOrtho(false, camWid, camHei);
@@ -132,4 +158,5 @@ public class LeaderboardScreen implements Screen {
 	public void dispose() {
 		stage.dispose();
 	}
+
 }
