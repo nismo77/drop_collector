@@ -1,5 +1,6 @@
 package com.mygdx.drop;
 import java.util.Iterator;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -19,7 +21,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
@@ -37,6 +38,9 @@ public class GameScreen implements Screen {
 	boolean flash = false;
 	boolean canPlay = false;
 	boolean storm = false;
+	private boolean newHighscore = false;
+	private boolean hsChecked = false;
+	private float hsScale = 0.2f;
 	float dropSpeed, dropSpeedFactor, sflakeSpeed;
 	
 	int scrWid = Gdx.graphics.getWidth(), scrHei = Gdx.graphics.getHeight();
@@ -58,6 +62,8 @@ public class GameScreen implements Screen {
 		try {
 			hsFile = Gdx.files.local("hs.hs");
 			System.out.println("Got hs file");
+			int i = game.prefs.getInteger("highscore");
+			System.out.printf("Current highscore: %d\n",i);
 		}
 		catch(Exception ex) {
 			System.out.print("Can't open scoreboard file: ");
@@ -65,7 +71,7 @@ public class GameScreen implements Screen {
 		stage = new Stage(new ScreenViewport());
 		table = new Table();
 		labelName = new Label("Enter name: ", game.skin, "black");
-		okBtn = new TextButton("Enter", game.skin);
+		okBtn = new TextButton("Enter", game.skin,"small");
 		nameField = new TextField("", game.skin);
 
 		table.setWidth(stage.getWidth());
@@ -86,7 +92,7 @@ public class GameScreen implements Screen {
 					player = new Player();
 					player.setName(nameField.getText());
 					if(player.getName().isEmpty()) {
-						player.setName("Unnamed player");
+						player.setName("Noname");
 					}
 					else {
 						if(player.getName().length() > 25) {
@@ -101,11 +107,11 @@ public class GameScreen implements Screen {
 			}
 		});
 		game.result = 0;
-		gameTime = 40.0f;
-		dropSpeedFactor = 0.3f;
+		gameTime = 30.0f;
+		dropSpeedFactor = 0.5f;
 		dropSpawnTime = 400;
 		droplets = new Array<DropRect>();
-		game.font.setColor(Color.MAGENTA);
+		game.font.setColor(Color.FOREST);
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		game.imgDrop = new Texture("droplet.png");
@@ -164,6 +170,21 @@ public class GameScreen implements Screen {
 				game.batch.draw(game.imgFlash, 0, 0);
 			}
 		}
+		
+		
+		
+		
+		if(newHighscore) {
+			game.font.setColor(Color.RED);
+			game.font.getData().setScale(hsScale);
+			game.font.draw(game.batch, "New record!", camWid/4, camHei/2);
+			game.font.setColor(Color.MAGENTA);
+			hsScale += 0.008f;
+			System.out.printf("Crr scale: %f\n", hsScale);
+			if(hsScale >= 0.5f) {
+				newHighscore = false;
+			}
+		}
 		game.batch.end();
 		if (canPlay) {
 			game.batch.begin();
@@ -172,8 +193,8 @@ public class GameScreen implements Screen {
 
 			game.font.draw(game.batch, "Drops Collected: " + game.result, 0, camHei - game.font.getScaleY());
 			game.font.draw(game.batch, "["+player.getName()+" ]", 0, camHei - game.font.getScaleY() - 30);
-			game.font.draw(game.batch, "Time: " + (int) gameTime, camWid - camWid * 0.3f,
-					camHei - game.font.getScaleY());
+			game.font.draw(game.batch, "Time: " + (int) gameTime, camWid - camWid * 0.15f,
+					camHei);
 			game.batch.draw(game.imgBucket, bucket.x, bucket.y);
 			for (DropRect raindrop : droplets) {
 				raindrop.img.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -260,12 +281,15 @@ public class GameScreen implements Screen {
 				if (dr.img == game.imgDrop) {
 					game.sndDrop.play();
 					game.result++;
+					iter.remove();
 				} else if (dr.img == game.imgSnowFlake) {
 					game.sndFlake.play();
 					game.result += 2;
+					iter.remove();
 				} else if (dr.img == game.imgWatch) {
 					game.sndBell.play();
 					gameTime = gameTime + 3 * sekunda;
+					iter.remove();
 				}
 				// storm happens here
 				if (game.result >= 50) {
@@ -278,15 +302,19 @@ public class GameScreen implements Screen {
 					}
 					if (storm) {
 						game.mscThunder.play();
-						dropSpeedFactor = 0.5f;
+						dropSpeedFactor = 0.8f;
 						dropSpawnTime = 200;
 					} else {
-						dropSpeedFactor = 0.3f;
+						dropSpeedFactor = 0.5f;
 						dropSpawnTime = 400;
 					}
 				}
-				iter.remove();
 			}
+		}
+		int i = game.prefs.getInteger("highscore");
+		if(game.result > i && (!hsChecked)) {
+			newHighscore = true;
+			hsChecked = true;
 		}
 		if (sekunda > 1) {
 			gameTime -= sekunda;
@@ -301,15 +329,21 @@ public class GameScreen implements Screen {
 		// check game end
 		if (gameTime <= 0) {
 			gameEnd = true;
-		}
-		if (gameTime <= 0) {
-			
 			player.setScore(game.result);
 			String finalScore = player.getName()+":"+player.getScore()+"\n";
 			hsFile.writeString(finalScore, true);		
-		
+			
+			// check highscore
+			int hs = game.prefs.getInteger("highscore");
+			if(game.result > hs) {
+				System.out.printf("New highscore! Value: %d\nPrevious: %d\n", game.result, hs);
+				game.prefs.putInteger("highscore", game.result);
+				game.prefs.flush();
+			}
 			game.setScreen(new EndScreen(this.game));
+		
 		}
+		
 		sekunda += Gdx.graphics.getDeltaTime();
 	}
 

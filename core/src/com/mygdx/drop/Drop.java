@@ -29,7 +29,7 @@ public class Drop extends Game {
 	public Music music;
 	public Skin skin;
 	public Preferences prefs;
-	public int result = 0 , highScore;
+	public int result = 0 , highScore = 0 ;
 	byte[] hsbyte;
 
 	FileHandle file;
@@ -37,7 +37,11 @@ public class Drop extends Game {
 
 	public void create() {
 		
-		
+		prefs = Gdx.app.getPreferences("dropcollector.prefs");
+		highScore = prefs.getInteger("highscore");
+		if(highScore == 0) {
+			prefs.putInteger("highscore", 0);
+		}
 		try {
 			skin = new Skin(Gdx.files.internal("skin/glassy/glassy-ui.json"));
 			System.out.println("Skin loaded successfully");

@@ -51,17 +51,17 @@ public class MainMenuScreen implements Screen {
 		table.align(Align.center|Align.center);
 		table.setPosition(0, Gdx.graphics.getHeight()/2);
 
-		table.add(titleLabel).padBottom(100);
+		table.add(titleLabel).padBottom(50);
 		table.row();
-		table.add(startBtn).width(btnWid).padBottom(50);
+		table.add(startBtn).width(btnWid).padBottom(10);
 		table.row();
-		table.add(settingsBtn).width(btnWid).padBottom(50);
+		table.add(settingsBtn).width(btnWid).padBottom(10);
 		table.row();
-		table.add(scoreBtn).width(btnWid).padBottom(50);
+		table.add(scoreBtn).width(btnWid).padBottom(10);
 		table.row();
-		table.add(creditsBtn).width(btnWid).padBottom(50);
+		table.add(creditsBtn).width(btnWid).padBottom(10);
 		table.row();
-		table.add(quitBtn).width(btnWid).padBottom(50);
+		table.add(quitBtn).width(btnWid).padBottom(10);
 		
 		stage.addActor(table);
 

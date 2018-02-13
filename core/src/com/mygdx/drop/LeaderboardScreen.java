@@ -45,9 +45,9 @@ public class LeaderboardScreen implements Screen {
 		back = new TextButton("Back", game.skin, "small");
 		titleLabel = new Label("Scoreboard", game.skin, "big-black");
 		table.setWidth(stage.getWidth());
-		table.align(Align.center | Align.center);
+		table.align(Align.top | Align.center);
 
-		table.setPosition(0, camHei / 2);
+		table.setPosition(0, camHei);
 //		table.setDebug(true);
 
 		Gdx.input.setInputProcessor(stage);
