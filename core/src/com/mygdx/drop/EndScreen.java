@@ -45,7 +45,7 @@ public class EndScreen implements Screen {
 
 	    final Label againLabel = new Label("Play again?",game.skin, "big");
 	    
-	   
+	    
 	    table.setWidth(stage.getWidth());
 	    table.align(Align.top|Align.center);
 	    table.setPosition(0, (Gdx.graphics.getHeight()/2)+yesButton.getHeight());
@@ -54,6 +54,8 @@ public class EndScreen implements Screen {
 
 	    
 //	    table.padTop();
+	    table.add(new Label("Score: "+game.result, game.skin, "big")).padBottom(20).colspan(2);
+	    table.row();
 	    table.add(againLabel).colspan(2).padBottom(camHei*0.05f);
 	    table.row();
 	    table.add(yesButton).center();

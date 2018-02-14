@@ -95,14 +95,13 @@ public class GameScreen implements Screen {
 						player.setName("Noname");
 					}
 					else {
-						if(player.getName().length() > 25) {
-							player.setName(player.getName().substring(0, 19));
+						if(player.getName().length() > 11) {
+							player.setName(player.getName().substring(0, 11));
 						}else player.setName(nameField.getText());
-					}
-				
+					}				
 					canPlay = true;					
 				} catch (Exception ex) {
-					System.out.println("Can't get player's name. Set default name :" + ex);
+					System.out.println("Can't get player's name. Set default name " + ex);
 				}
 			}
 		});
@@ -178,7 +177,7 @@ public class GameScreen implements Screen {
 			game.font.setColor(Color.RED);
 			game.font.getData().setScale(hsScale);
 			game.font.draw(game.batch, "New record!", camWid/4, camHei/2);
-			game.font.setColor(Color.MAGENTA);
+			game.font.setColor(Color.FOREST );
 			hsScale += 0.008f;
 			System.out.printf("Crr scale: %f\n", hsScale);
 			if(hsScale >= 0.5f) {
@@ -277,7 +276,7 @@ public class GameScreen implements Screen {
 			if (dr.y < 0) {
 				iter.remove();
 			}
-			if (dr.overlaps(bucket)) {
+			else if (dr.overlaps(bucket)) {
 				if (dr.img == game.imgDrop) {
 					game.sndDrop.play();
 					game.result++;
