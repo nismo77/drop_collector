@@ -41,7 +41,6 @@ public class EndScreen implements Screen {
 		
 		final TextButton yesButton = new TextButton("Yes",game.skin);
 		final TextButton noButton =  new TextButton("No" ,game.skin);
-		final TextButton againButton =  new TextButton("Again?" ,game.skin);
 
 	    final Label againLabel = new Label("Play again?",game.skin, "big");
 	    

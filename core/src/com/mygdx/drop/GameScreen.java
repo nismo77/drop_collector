@@ -36,7 +36,7 @@ public class GameScreen implements Screen {
 	long lastTimeDrop;
 	boolean gameEnd = false;
 	boolean flash = false;
-	boolean canPlay = false;
+	boolean canPlay = false; // commit
 	boolean storm = false;
 	private boolean newHighscore = false;
 	private boolean hsChecked = false;
